@@ -21,7 +21,7 @@
 		margin : '90px auto 0'
 	}
 		
-	var diffArrayElements, commonArrayElements;
+	var diffArrayElements, commonArrayElements, errorMessage = "";;
 	
 	/**
 	 * This method is used to sort the given numbers numerically.
@@ -111,7 +111,8 @@
 				differentElements:"",
 				sameElements:"",
 				diffStyle:{display:"none"},
-				sameStyle:{display:"none"}				
+				sameStyle:{display:"none"},
+				errorStyle:{display:"none"}				
 			}
 		},
 		showNotification:function(){
@@ -119,20 +120,33 @@
 			this.state.sameElements ="";
 			
 			if(this.props.diff){
-				this.state.differentElements = this.state.differentElements + this.props.diff; 
+				this.state.differentElements = this.state.differentElements + this.props.diff; 		
 				this.state.diffStyle.display = "block";
+			}
+			else{
+				this.state.diffStyle.display ="none";
 			}
 			if(this.props.common){
 				this.state.sameElements = this.state.sameElements +this.props.common;
 				this.state.sameStyle.display = "block";
+			}
+			else{
+				this.state.sameStyle.display = "none";
+			}
+			if(this.props.error!=""){
+				this.state.errorStyle.display = "block";
+			}
+			else{
+				this.state.errorStyle.display = "none";
 			}
 		},
 		render : function () {
 			this.showNotification();
 			return (
 				React.createElement("div", null, 
-					React.createElement("div", {className: "alert-box error", style: this.state.sameStyle}, React.createElement("span", null, "Unique Elements: "), this.state.sameElements), 
-					React.createElement("div", {className: "alert-box success", style: this.state.diffStyle}, React.createElement("span", null, "Different Elements: "), this.state.differentElements)
+					React.createElement("div", {className: "alert-box error", style: this.state.sameStyle}, React.createElement("span", null, "Duplicate Elements: "), this.state.sameElements), 
+					React.createElement("div", {className: "alert-box success", style: this.state.diffStyle}, React.createElement("span", null, "Unique Elements: "), this.state.differentElements), 
+					React.createElement("div", {className: "alert-box error", style: this.state.errorStyle}, React.createElement("span", null, "Error: "), this.props.error)
 				)
 			);
 		}
@@ -148,16 +162,21 @@
 	*/
 		process : function(e) {
 			if (e.keyCode === 13) { 
+				errorMessage = "";
 				var input = e.target.value;
 				var inputArray = input.getArray();
 
-				if (inputArray.length === 0) { throw new Error('Error in input'); };
+				if (inputArray.length === 0) { 
+					errorMessage='Please type a valid input';
+					React.render(React.createElement(Application, {error: errorMessage}),$el);
+					return this;
+			 };
 
 				commonArrayElements = existingArray.intersection(inputArray).join(',')
 				diffArrayElements = inputArray.difference(existingArray).join(',')
 				
 				React.render(
-					React.createElement(Application, {diff: diffArrayElements, common: commonArrayElements}),
+					React.createElement(Application, {diff: diffArrayElements, common: commonArrayElements, error: errorMessage}),
 					$el
 				);
 				
@@ -179,7 +198,7 @@
 		render : function () {
 			return (
 				React.createElement("div", {id: "application"}, 
-					React.createElement(NotificationItem, {diff: diffArrayElements, common: commonArrayElements}), 
+					React.createElement(NotificationItem, {diff: diffArrayElements, common: commonArrayElements, error: errorMessage}), 
 					React.createElement(InputField, null)
 				)
 			);
@@ -190,7 +209,7 @@
 	 * This will render the application component
 	 */
 	React.render(
-		React.createElement(Application, {diff: diffArrayElements, common: commonArrayElements}),
+		React.createElement(Application, {diff: diffArrayElements, common: commonArrayElements, error: errorMessage}),
 		$el
 	);
 
