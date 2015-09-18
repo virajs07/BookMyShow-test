@@ -119,14 +119,14 @@
 			this.state.differentElements  ="";
 			this.state.sameElements ="";
 			
-			if(this.props.diff){
+			if(this.props.diff && this.props.diff.length>0){
 				this.state.differentElements = this.state.differentElements + this.props.diff; 		
 				this.state.diffStyle.display = "block";
 			}
 			else{
 				this.state.diffStyle.display ="none";
 			}
-			if(this.props.common){
+			if(this.props.common && this.props.common.length>0){
 				this.state.sameElements = this.state.sameElements +this.props.common;
 				this.state.sameStyle.display = "block";
 			}
@@ -163,6 +163,8 @@
 		process : function(e) {
 			if (e.keyCode === 13) { 
 				errorMessage = "";
+				commonArrayElements = [],
+				diffArrayElements= []
 				var input = e.target.value;
 				var inputArray = input.getArray();
 
